@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>F1 2026 Season Carousel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #000000;
+    --white: #FFFFFF;
+    --red: #FF3333;
+    --gray: #8A8A8A;
+    --font-head: 'Space Mono', 'Courier New', monospace;
+    --font-body: 'Space Grotesk', 'Helvetica Neue', sans-serif;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0; padding: 0; height: 100%; width: 100%;
+    background: var(--black); color: var(--white);
+    font-family: var(--font-body);
+    overflow: hidden;
+  }
+
+  ::selection { background: var(--red); color: var(--black); }
+
+  /* ---------- stage ---------- */
+  .stage {
+    position: relative;
+    height: 100%; width: 100%;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  #carousel {
+    position: relative;
+    width: min(460px, 88vw);
+    height: min(720px, 90vh);
+    perspective: 900px;
+  }
+
+  .card {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: var(--white);
+    color: var(--black);
+    border: 4px solid var(--white);
+    box-shadow: 8px 8px 0 0 var(--red);
+    transition: transform 0.5s ease, opacity 0.5s ease;
+    display: flex; flex-direction: column;
+    padding: 34px;
+    cursor: pointer;
+  }
+  .card.center { cursor: default; box-shadow: 12px 12px 0 0 var(--red); }
+
+  .card .meta-row {
+    display: flex; align-items: baseline; justify-content: space-between;
+    gap: 12px; margin-bottom: 18px;
+  }
+
+  .card .round-tag {
+    font-family: var(--font-head); font-size: 0.85rem; opacity: 0.55;
+    letter-spacing: 0.04em;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  .card .country {
+    font-family: var(--font-head); font-weight: 700; text-transform: uppercase;
+    font-size: clamp(2.2rem, 8vw, 3.2rem); line-height: 1.35; margin-bottom: 16px;
+    text-wrap: balance;
+  }
+  .card .country span {
+    background: var(--red);
+    padding: 4px 14px;
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
+  }
+
+  .card .title {
+    font-size: 1.05rem; font-weight: 500; line-height: 1.35;
+    margin-bottom: 6px; opacity: 0.85;
+  }
+
+  .card .podium {
+    flex: 1;
+    min-height: 0;
+    border-top: 3px solid var(--black);
+    padding-top: 12px;
+    overflow-y: auto;
+    display: flex; flex-direction: column; gap: 4px;
+    scrollbar-width: thin;
+    scrollbar-color: transparent transparent;
+  }
+  .card .podium.scrolling { scrollbar-color: var(--black) transparent; }
+  .card .podium::-webkit-scrollbar { width: 8px; }
+  .card .podium::-webkit-scrollbar-track { background: transparent; }
+  .card .podium::-webkit-scrollbar-thumb { background: transparent; }
+  .card .podium.scrolling::-webkit-scrollbar-thumb { background: var(--black); }
+
+  .card .podium .row {
+    display: flex; flex-direction: column;
+    padding: 12px 0;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  .card .podium .car-track {
+    height: 48px;
+    overflow: hidden;
+    margin-bottom: 8px;
+  }
+  .card .podium .car-img {
+    height: 100%; width: auto;
+  }
+  .card .podium .row.play .car-img {
+    animation: carSlideIn 0.6s cubic-bezier(.2,.7,.3,1) both;
+  }
+
+  .card .divider {
+    border-top: 3px solid var(--black);
+    margin-top: 12px;
+  }
+
+  .card .podium .name-line {
+    display: flex; align-items: baseline; gap: 12px;
+    font-family: var(--font-head); font-size: 1.3rem;
+  }
+  .card .podium .pos { width: 32px; font-weight: 700; flex-shrink: 0; }
+  .card .podium .row:nth-child(1) .pos { color: var(--red); }
+  .card .podium .name {
+    font-weight: 700; flex: 1; text-transform: uppercase;
+    transition: font-size 0.3s ease, opacity 0.15s ease;
+    cursor: pointer;
+  }
+  .card .podium .name:hover { opacity: 0.55; }
+  .card .podium .row.highlight .name {
+    font-size: 1.7rem;
+    letter-spacing: -0.02em;
+    white-space: nowrap;
+  }
+  .card .podium .points {
+    font-family: var(--font-head); font-weight: 700; font-size: 1.3rem;
+  }
+  .card .podium .time {
+    font-family: var(--font-head); opacity: 0.55; font-size: 0.85rem;
+    margin-top: 2px; padding-left: 44px;
+  }
+
+  @keyframes carSlideIn {
+    from { transform: translateX(-120%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+  }
+
+  .card .podium.chart-mode .row { display: none; }
+  .card .podium .chart-view { display: none; }
+  .card .podium.chart-mode .chart-view {
+    display: flex; flex-direction: column;
+    flex: 1; min-height: 0;
+  }
+
+  .card .chart-header {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px; margin-bottom: 16px; flex-shrink: 0;
+  }
+  .card .chart-driver-name {
+    font-family: var(--font-head); font-weight: 700; font-size: 1.15rem;
+    text-transform: uppercase; letter-spacing: -0.01em;
+  }
+  .card .chart-close {
+    font-family: var(--font-head); font-weight: 700; font-size: 1rem;
+    width: 34px; height: 34px; flex-shrink: 0;
+    border: 3px solid var(--black); background: var(--white); color: var(--black);
+    cursor: pointer;
+    box-shadow: 3px 3px 0 0 var(--red);
+    transition: transform 100ms steps(2), box-shadow 100ms steps(2);
+  }
+  .card .chart-close:hover { transform: translate(1px, 1px); box-shadow: 1px 1px 0 0 var(--red); }
+  .card .chart-close:active { transform: translate(3px, 3px); box-shadow: none; }
+
+  .card .chart-svg { width: 100%; height: auto; flex: 1; min-height: 0; display: block; }
+  .card .chart-bar { fill: var(--black); }
+  .card .chart-points { font-family: var(--font-head); font-weight: 700; font-size: 11px; fill: var(--black); text-anchor: middle; }
+  .card .chart-circle.podium3 { fill: var(--red); }
+  .card .chart-circle.other { fill: var(--black); }
+  .card .chart-pos-label { font-family: var(--font-head); font-weight: 700; font-size: 11px; fill: var(--white); text-anchor: middle; dominant-baseline: central; }
+  .card .chart-baseline { stroke: var(--black); stroke-width: 3; }
+
+  @media (max-width: 520px) {
+    #carousel { width: 86vw; height: 76vh; }
+    .card { padding: 24px; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="stage">
+    <div id="carousel"></div>
+  </div>
+
+<script>
+  const races = [
+    { round: "ROUND 1", status: "done", country: "Australia", title: "Formula 1 Qatar Airways Australian Grand Prix 2026", date: "06 - 08 Mar",
+      results: [
+        ["1","George Russell","Mercedes","1:23:06.801"],
+        ["2","Kimi Antonelli","Mercedes","+2.974s"],
+        ["3","Charles Leclerc","Ferrari","+15.519s"],
+        ["4","Lewis Hamilton","Ferrari","+16.144s"],
+        ["5","Lando Norris","McLaren","+51.741s"],
+        ["6","Max Verstappen","Red Bull Racing","+54.617s"],
+        ["7","Oliver Bearman","Haas F1 Team","+1 lap"],
+        ["8","Arvid Lindblad","Racing Bulls","+1 lap"],
+        ["9","Gabriel Bortoleto","Audi","+1 lap"],
+        ["10","Pierre Gasly","Alpine","+1 lap"]
+      ] },
+    { round: "ROUND 2", status: "done", country: "China", title: "Formula 1 Heineken Chinese Grand Prix 2026", date: "13 - 15 Mar",
+      results: [
+        ["1","Kimi Antonelli","Mercedes","1:33:15.607"],
+        ["2","George Russell","Mercedes","+5.515s"],
+        ["3","Lewis Hamilton","Ferrari","+25.267s"],
+        ["4","Charles Leclerc","Ferrari","+28.894s"],
+        ["5","Oliver Bearman","Haas F1 Team","+57.268s"],
+        ["6","Pierre Gasly","Alpine","+59.647s"],
+        ["7","Liam Lawson","Racing Bulls","+80.588s"],
+        ["8","Isack Hadjar","Red Bull Racing","+87.247s"],
+        ["9","Carlos Sainz","Williams","+1 lap"],
+        ["10","Franco Colapinto","Alpine","+1 lap"]
+      ] },
+    { round: "ROUND 3", status: "done", country: "Japan", title: "Formula 1 Aramco Japanese Grand Prix 2026", date: "27 - 29 Mar",
+      results: [
+        ["1","Kimi Antonelli","Mercedes","1:28:03.403"],
+        ["2","Oscar Piastri","McLaren","+13.722s"],
+        ["3","Charles Leclerc","Ferrari","+15.270s"],
+        ["4","George Russell","Mercedes","+15.754s"],
+        ["5","Lando Norris","McLaren","+23.479s"],
+        ["6","Lewis Hamilton","Ferrari","+25.037s"],
+        ["7","Pierre Gasly","Alpine","+32.340s"],
+        ["8","Max Verstappen","Red Bull Racing","+32.677s"],
+        ["9","Liam Lawson","Racing Bulls","+50.180s"],
+        ["10","Esteban Ocon","Haas F1 Team","+51.216s"]
+      ] },
+    { round: "ROUND 4", status: "done", country: "Miami", title: "Formula 1 Crypto.com Miami Grand Prix 2026", date: "01 - 03 May",
+      results: [
+        ["1","Kimi Antonelli","Mercedes","1:33:19.273"],
+        ["2","Lando Norris","McLaren","+3.264s"],
+        ["3","Oscar Piastri","McLaren","+27.092s"],
+        ["4","George Russell","Mercedes","+43.051s"],
+        ["5","Max Verstappen","Red Bull Racing","+48.949s"],
+        ["6","Lewis Hamilton","Ferrari","+53.753s"],
+        ["7","Franco Colapinto","Alpine","+61.871s"],
+        ["8","Charles Leclerc","Ferrari","+64.245s"],
+        ["9","Carlos Sainz","Williams","+82.072s"],
+        ["10","Alexander Albon","Williams","+90.972s"]
+      ] },
+    { round: "ROUND 5", status: "done", country: "Canada", title: "Formula 1 Lenovo Grand Prix du Canada 2026", date: "22 - 24 May",
+      results: [
+        ["1","Kimi Antonelli","Mercedes","1:28:15.758"],
+        ["2","Lewis Hamilton","Ferrari","+10.768s"],
+        ["3","Max Verstappen","Red Bull Racing","+11.276s"],
+        ["4","Charles Leclerc","Ferrari","+44.151s"],
+        ["5","Isack Hadjar","Red Bull Racing","+1 lap"],
+        ["6","Franco Colapinto","Alpine","+1 lap"],
+        ["7","Liam Lawson","Racing Bulls","+1 lap"],
+        ["8","Pierre Gasly","Alpine","+1 lap"],
+        ["9","Carlos Sainz","Williams","+1 lap"],
+        ["10","Oliver Bearman","Haas F1 Team","+1 lap"]
+      ] },
+    { round: "ROUND 6", status: "done", country: "Monaco", title: "Formula 1 Louis Vuitton Grand Prix de Monaco 2026", date: "05 - 07 Jun",
+      results: [
+        ["1","Kimi Antonelli","Mercedes","2:23:31.243"],
+        ["2","Lewis Hamilton","Ferrari","+6.271s"],
+        ["3","Pierre Gasly","Alpine","+20.369s"],
+        ["4","Isack Hadjar","Red Bull Racing","+23.394s"],
+        ["5","Oscar Piastri","McLaren","+24.261s"],
+        ["6","Liam Lawson","Racing Bulls","+26.553s"],
+        ["7","Arvid Lindblad","Racing Bulls","+29.010s"],
+        ["8","Alexander Albon","Williams","+33.413s"],
+        ["9","Esteban Ocon","Haas F1 Team","+37.140s"],
+        ["10","Fernando Alonso","Aston Martin","+41.899s"]
+      ] },
+    { round: "ROUND 7", status: "done", country: "Barcelona-Catalunya", title: "Formula 1 MSC Cruises Gran Premio de Barcelona-Catalunya 2026", date: "12 - 14 Jun",
+      results: [
+        ["1","Lewis Hamilton","Ferrari","1:32:28.105"],
+        ["2","George Russell","Mercedes","+19.561s"],
+        ["3","Lando Norris","McLaren","+23.719s"],
+        ["4","Max Verstappen","Red Bull Racing","+40.497s"],
+        ["5","Oscar Piastri","McLaren","+58.661s"],
+        ["6","Isack Hadjar","Red Bull Racing","+1 lap"],
+        ["7","Pierre Gasly","Alpine","+1 lap"],
+        ["8","Liam Lawson","Racing Bulls","+1 lap"],
+        ["9","Arvid Lindblad","Racing Bulls","+1 lap"],
+        ["10","Franco Colapinto","Alpine","+1 lap"]
+      ] },
+    { round: "ROUND 8", status: "done", country: "Austria", title: "Formula 1 Lenovo Austrian Grand Prix 2026", date: "26 - 28 Jun",
+      results: [
+        ["1","George Russell","Mercedes","1:26:37.979"],
+        ["2","Max Verstappen","Red Bull Racing","+1.611s"],
+        ["3","Kimi Antonelli","Mercedes","+1.986s"],
+        ["4","Oscar Piastri","McLaren","+21.809s"],
+        ["5","Lewis Hamilton","Ferrari","+26.393s"],
+        ["6","Isack Hadjar","Red Bull Racing","+29.399s"],
+        ["7","Lando Norris","McLaren","+31.505s"],
+        ["8","Charles Leclerc","Ferrari","+45.659s"],
+        ["9","Liam Lawson","Racing Bulls","+1 lap"],
+        ["10","Arvid Lindblad","Racing Bulls","+1 lap"]
+      ] },
+    { round: "ROUND 9", status: "done", country: "Great Britain", title: "Formula 1 Pirelli British Grand Prix 2026", date: "03 - 05 Jul",
+      results: [
+        ["1","Charles Leclerc","Ferrari","1:27:11.335"],
+        ["2","George Russell","Mercedes","+0.427s"],
+        ["3","Lewis Hamilton","Ferrari","+0.772s"],
+        ["4","Lando Norris","McLaren","+1.149s"],
+        ["5","Isack Hadjar","Red Bull Racing","+1.598s"],
+        ["6","Liam Lawson","Racing Bulls","+2.023s"],
+        ["7","Arvid Lindblad","Racing Bulls","+2.214s"],
+        ["8","Gabriel Bortoleto","Audi","+2.413s"],
+        ["9","Franco Colapinto","Alpine","+3.229s"],
+        ["10","Pierre Gasly","Alpine","+3.445s"]
+      ] },
+    { round: "ROUND 10", status: "done", country: "Belgium", title: "Formula 1 Moët & Chandon Belgian Grand Prix 2026", date: "17 - 19 Jul",
+      results: [
+        ["1","Kimi Antonelli","Mercedes","1:24:42.479"],
+        ["2","Charles Leclerc","Ferrari","+1.952s"],
+        ["3","Max Verstappen","Red Bull Racing","+11.586s"],
+        ["4","Lewis Hamilton","Ferrari","+17.245s"],
+        ["5","Oscar Piastri","McLaren","+18.988s"],
+        ["6","Isack Hadjar","Red Bull Racing","+23.307s"],
+        ["7","Lando Norris","McLaren","+24.014s"],
+        ["8","Gabriel Bortoleto","Audi","+49.140s"],
+        ["9","Arvid Lindblad","Racing Bulls","+50.406s"],
+        ["10","Franco Colapinto","Alpine","+76.037s"]
+      ] },
+    { round: "ROUND 11", status: "done", country: "Hungary", title: "Formula 1 AWS Hungarian Grand Prix 2026", date: "24 - 26 Jul",
+      results: [
+        ["1","Lando Norris","McLaren","1:39:56.180"],
+        ["2","Max Verstappen","Red Bull Racing","+15.080s"],
+        ["3","Kimi Antonelli","Mercedes","+18.728s"],
+        ["4","Charles Leclerc","Ferrari","+23.840s"],
+        ["5","Lewis Hamilton","Ferrari","+24.540s"],
+        ["6","Isack Hadjar","Red Bull Racing","+55.488s"],
+        ["7","George Russell","Mercedes","+57.503s"],
+        ["8","Liam Lawson","Racing Bulls","+1 lap"],
+        ["9","Nico Hulkenberg","Audi","+1 lap"],
+        ["10","Arvid Lindblad","Racing Bulls","+1 lap"]
+      ] },
+    { round: "ROUND 12", status: "done", country: "Netherlands", title: "Formula 1 Heineken Dutch Grand Prix 2026", date: "21 - 23 Aug",
+      results: [
+        ["1","Lando Norris","McLaren","2:04:44.859"],
+        ["2","Kimi Antonelli","Mercedes","+11.536s"],
+        ["3","George Russell","Mercedes","+15.906s"],
+        ["4","Lewis Hamilton","Ferrari","+16.755s"],
+        ["5","Charles Leclerc","Ferrari","+17.258s"],
+        ["6","Oscar Piastri","McLaren","+32.332s"],
+        ["7","Liam Lawson","Red Bull Racing","+79.915s"],
+        ["8","Nico Hulkenberg","Audi","+1 lap"],
+        ["9","Fernando Alonso","Aston Martin","+1 lap"],
+        ["10","Pierre Gasly","Alpine","+1 lap"]
+      ] },
+    { round: "ROUND 13", status: "next", country: "Italy", title: "Formula 1 Pirelli Gran Premio d'Italia 2026", date: "04 - 06 Sep" },
+    { round: "ROUND 14", status: "upcoming", country: "Spain", title: "Formula 1 TAG Heuer Gran Premio de España 2026", date: "11 - 13 Sep" },
+    { round: "ROUND 15", status: "upcoming", country: "Azerbaijan", title: "Formula 1 Qatar Airways Azerbaijan Grand Prix 2026", date: "24 - 26 Sep" },
+    { round: "ROUND 16", status: "upcoming", country: "Bahrain (Malaysia)", title: "Formula 1 Gulf Air Bahrain Grand Prix in Malaysia 2026", date: "02 - 04 Oct" },
+    { round: "ROUND 17", status: "upcoming", country: "Singapore", title: "Formula 1 Singapore Airlines Singapore Grand Prix 2026", date: "09 - 11 Oct" },
+    { round: "ROUND 18", status: "upcoming", country: "United States", title: "Formula 1 MSC Cruises United States Grand Prix 2026", date: "23 - 25 Oct" },
+    { round: "ROUND 19", status: "upcoming", country: "Mexico", title: "Formula 1 Gran Premio de la Ciudad de México 2026", date: "30 Oct - 01 Nov" },
+    { round: "ROUND 20", status: "upcoming", country: "Brazil", title: "Formula 1 MSC Cruises Grande Prêmio de São Paulo 2026", date: "06 - 08 Nov" },
+    { round: "ROUND 21", status: "upcoming", country: "Las Vegas", title: "Formula 1 Heineken Las Vegas Grand Prix 2026", date: "19 - 21 Nov" },
+    { round: "ROUND 22", status: "upcoming", country: "Qatar", title: "Formula 1 Qatar Airways Qatar Grand Prix 2026", date: "27 - 29 Nov" },
+    { round: "ROUND 23", status: "upcoming", country: "Abu Dhabi", title: "Formula 1 Etihad Airways Abu Dhabi Grand Prix 2026", date: "04 - 06 Dec" }
+  ];
+
+  const teamCars = {
+    "McLaren": "cars/2026mclarencarright.png",
+    "Mercedes": "cars/2026mercedescarright.png",
+    "Ferrari": "cars/2026ferraricarright.png",
+    "Red Bull Racing": "cars/2026redbullracingcarright.png",
+    "Racing Bulls": "cars/2026racingbullscarright.png",
+    "Audi": "cars/2026audicarright.png",
+    "Aston Martin": "cars/2026astonmartincarright.png",
+    "Alpine": "cars/2026alpinecarright.png",
+    "Williams": "cars/2026williamscarright.png",
+    "Haas F1 Team": "cars/2026haasf1teamcarright.png"
+  };
+
+  const POINTS = [25, 18, 15, 12, 10, 8, 6, 4, 2, 1];
+
+  function buildDriverHistory() {
+    const completedRaces = races.filter(r => r.status === "done" && r.results);
+
+    const driverNames = new Set();
+    completedRaces.forEach(r => r.results.forEach(([pos, name]) => driverNames.add(name)));
+
+    const history = {};
+    driverNames.forEach(name => {
+      history[name] = completedRaces.map(r => {
+        const idx = r.results.findIndex(([pos, n]) => n === name);
+        if (idx === -1) {
+          return { round: r.round, country: r.country, pos: null, points: 0 };
+        }
+        return {
+          round: r.round,
+          country: r.country,
+          pos: Number(r.results[idx][0]),
+          points: POINTS[idx] || 0
+        };
+      });
+    });
+    return history;
+  }
+  const driverHistory = buildDriverHistory();
+
+  function buildChartSVG(entries) {
+    const unit = 44;
+    const barWidth = 22;
+    const plotHeight = 140;
+    const marginTop = 24;
+    const marginBottom = 46;
+    const marginX = 22;
+    const width = Math.max(entries.length * unit + marginX * 2, 200);
+    const height = marginTop + plotHeight + marginBottom;
+    const baselineY = marginTop + plotHeight;
+
+    const bars = entries.map((e, i) => {
+      const x = marginX + i * unit + unit / 2;
+      const barHeight = (e.points / 25) * plotHeight;
+      const barY = baselineY - barHeight;
+      const circleY = baselineY + 22;
+      const circleClass = e.pos !== null && e.pos <= 3 ? "podium3" : "other";
+      const posLabel = e.pos !== null ? e.pos : "–";
+      return `
+        <text class="chart-points" x="${x}" y="${barY - 8}">${e.points}</text>
+        <rect class="chart-bar" x="${x - barWidth / 2}" y="${barY}" width="${barWidth}" height="${barHeight}"></rect>
+        <circle class="chart-circle ${circleClass}" cx="${x}" cy="${circleY}" r="12"></circle>
+        <text class="chart-pos-label" x="${x}" y="${circleY}">${posLabel}</text>
+      `;
+    }).join("");
+
+    return `
+      <svg class="chart-svg" viewBox="0 0 ${width} ${height}" preserveAspectRatio="xMidYMid meet">
+        <line class="chart-baseline" x1="${marginX}" y1="${baselineY}" x2="${width - marginX}" y2="${baselineY}"></line>
+        ${bars}
+      </svg>
+    `;
+  }
+
+  function showDriverChart(cardEl, name) {
+    const podiumEl = cardEl.querySelector(".podium");
+    if (!podiumEl) return;
+    const entries = driverHistory[name] || [];
+
+    let chartView = podiumEl.querySelector(".chart-view");
+    if (!chartView) {
+      chartView = document.createElement("div");
+      chartView.className = "chart-view";
+      podiumEl.appendChild(chartView);
+    }
+    chartView.innerHTML = `
+      <div class="chart-header">
+        <span class="chart-driver-name">${name}</span>
+        <button class="chart-close" aria-label="Back to results">&times;</button>
+      </div>
+      ${buildChartSVG(entries)}
+    `;
+    chartView.querySelector(".chart-close").addEventListener("click", (e) => {
+      e.stopPropagation();
+      podiumEl.classList.remove("chart-mode");
+    });
+
+    podiumEl.classList.add("chart-mode");
+  }
+
+  const carousel = document.getElementById("carousel");
+
+  let currentIndex = races.map(r => r.status).lastIndexOf("done");
+  if (currentIndex === -1) currentIndex = 0;
+
+  function cardHTML(r, i) {
+    const results = r.results
+      ? `<div class="podium">${r.results.map(([pos, name, team, time], idx) => {
+            const car = teamCars[team] || "";
+            const points = POINTS[idx] || 0;
+            const nameParts = name.trim().split(/\s+/);
+            const lastName = nameParts.pop();
+            const firstName = nameParts.join(" ");
+            return `
+            <div class="row">
+              <div class="car-track">${car ? `<img class="car-img" src="${car}" alt="${name} car" style="animation-delay:${(idx * 0.15).toFixed(2)}s">` : ""}</div>
+              <div class="name-line">
+                <span class="pos">${pos}</span>
+                <span class="name" data-full="${name}"><span class="first">${firstName}</span> <span class="last">${lastName}</span></span>
+                <span class="points">${points}</span>
+              </div>
+              <div class="time">${time}</div>
+            </div>`;
+          }).join("")}</div>`
+      : `<div class="divider"></div>`;
+
+    return `
+      <div class="meta-row">
+        <span class="round-tag">2026 &nbsp;${r.round} / ${races.length}</span>
+        <span class="round-tag">${r.date}</span>
+      </div>
+      <div class="country"><span>${r.country}</span></div>
+      <div class="title">${r.title}</div>
+      ${results}
+    `;
+  }
+
+  function createCards() {
+    races.forEach((r, i) => {
+      const el = document.createElement("div");
+      el.className = "card";
+      el.innerHTML = cardHTML(r, i);
+      el.addEventListener("click", () => {
+        const idx = races.indexOf(r);
+        if (idx !== currentIndex) { currentIndex = idx; updateCards(); }
+      });
+      const podiumEl = el.querySelector(".podium");
+      if (podiumEl) {
+        let scrollTimer;
+        podiumEl.addEventListener("scroll", () => {
+          podiumEl.classList.add("scrolling");
+          clearTimeout(scrollTimer);
+          scrollTimer = setTimeout(() => podiumEl.classList.remove("scrolling"), 700);
+          setHighlightRow(topRowOf(podiumEl));
+        });
+        setHighlightRow(podiumEl.querySelector(".row"));
+        podiumEl.addEventListener("click", (e) => {
+          const nameEl = e.target.closest(".name");
+          if (!nameEl || !el.classList.contains("center")) return;
+          e.stopPropagation();
+          showDriverChart(el, nameEl.dataset.full);
+        });
+      }
+      carousel.appendChild(el);
+    });
+    updateCards();
+  }
+
+  function topRowOf(podiumEl) {
+    const rows = podiumEl.querySelectorAll(".row");
+    if (!rows.length) return null;
+    const podiumTop = podiumEl.getBoundingClientRect().top;
+    let target = rows[0];
+    for (const row of rows) {
+      if (row.getBoundingClientRect().top - podiumTop <= 80) target = row;
+      else break;
+    }
+    return target;
+  }
+
+  function setHighlightRow(row) {
+    if (!row) return;
+    const podiumEl = row.closest(".podium");
+    const current = podiumEl.querySelector(".row.highlight");
+    if (current === row) return;
+    if (current) current.classList.remove("highlight");
+    row.classList.add("highlight");
+  }
+
+  /* -- carousel scroll/stack math, adapted from the source project's script.js -- */
+  function updateCards() {
+    const cardWidth = 300;
+    const cardSpacing = 100;
+    const adjacentCardScale = 0.5;
+    const farCardScale = 0.4;
+    const cards = carousel.children;
+
+    for (let i = 0; i < cards.length; i++) {
+      const card = cards[i];
+      const offset = i - currentIndex;
+      let translateX, translateZ, rotateY, scale;
+
+      if (offset === 0) {
+        translateX = 0; translateZ = 0; rotateY = 0; scale = 1;
+        card.className = "card center";
+        playPodiumAnimation(card);
+      } else {
+        const absOffset = Math.abs(offset);
+        const direction = offset < 0 ? -1 : 1;
+        if (absOffset === 1) {
+          translateX = direction * (cardWidth / 2 + cardSpacing);
+          scale = adjacentCardScale;
+        } else {
+          translateX = direction * (cardWidth / 2 + cardSpacing + (absOffset - 1) * (cardWidth * adjacentCardScale + cardSpacing));
+          scale = farCardScale;
+        }
+        translateZ = -100 * absOffset;
+        rotateY = direction * -15;
+        card.className = "card";
+      }
+
+      card.style.transform = `translateX(${translateX}px) translateZ(${translateZ}px) rotateY(${rotateY}deg) scale(${scale})`;
+      card.style.opacity = Math.abs(offset) > 2 ? 0 : 1;
+      card.style.zIndex = 1000 - Math.abs(offset);
+      card.style.pointerEvents = Math.abs(offset) > 2 ? "none" : "auto";
+    }
+
+  }
+
+  function playPodiumAnimation(card) {
+    const rows = card.querySelectorAll(".podium .row");
+    rows.forEach(row => {
+      row.classList.remove("play");
+      void row.offsetWidth; // force reflow so the animation restarts
+      row.classList.add("play");
+    });
+  }
+
+  function goTo(index) {
+    if (index < 0 || index > races.length - 1) return;
+    currentIndex = index;
+    updateCards();
+  }
+
+  let scrollAccumulator = 0;
+  const scrollThreshold = 105;
+
+  function handleWheel(event) {
+    event.preventDefault();
+    scrollAccumulator += Math.abs(event.deltaY);
+    if (scrollAccumulator >= scrollThreshold) {
+      scrollAccumulator = 0;
+      if (event.deltaY > 0) goTo(currentIndex + 1);
+      else if (event.deltaY < 0) goTo(currentIndex - 1);
+    }
+  }
+
+  createCards();
+
+  document.addEventListener("wheel", handleWheel, { passive: false });
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "ArrowRight") goTo(currentIndex + 1);
+    if (e.key === "ArrowLeft") goTo(currentIndex - 1);
+  });
+
+  /* touch swipe for mobile */
+  let touchStartX = 0;
+  document.addEventListener("touchstart", (e) => { touchStartX = e.touches[0].clientX; }, { passive: true });
+  document.addEventListener("touchend", (e) => {
+    const dx = e.changedTouches[0].clientX - touchStartX;
+    if (Math.abs(dx) < 40) return;
+    if (dx < 0) goTo(currentIndex + 1);
+    else goTo(currentIndex - 1);
+  }, { passive: true });
+</script>
+</body>
+</html>

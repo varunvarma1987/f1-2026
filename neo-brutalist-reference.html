@@ -1,0 +1,406 @@
+<title>Brutal Reference</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --yellow: #FFFC00;
+    --black: #000000;
+    --white: #FFFFFF;
+    --lime: #00FF00;
+    --magenta: #FF00FF;
+    --blue: #0066FF;
+    --red: #FF3333;
+    --gray: #6B6B6B;
+    --font-head: 'Space Mono', 'Courier New', monospace;
+    --font-body: 'Space Grotesk', 'Helvetica Neue', sans-serif;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--white);
+    color: var(--black);
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::selection { background: var(--black); color: var(--yellow); }
+
+  a { color: inherit; }
+
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 0 24px; }
+
+  h1, h2, h3, h4 {
+    font-family: var(--font-head);
+    font-weight: 700;
+    text-transform: uppercase;
+    line-height: 0.95;
+    margin: 0;
+    text-wrap: balance;
+    letter-spacing: -0.01em;
+  }
+
+  code, .mono { font-family: var(--font-head); }
+
+  hr { border: none; border-top: 4px solid var(--black); margin: 0; }
+
+  /* ---------- topbar ---------- */
+  .topbar {
+    position: sticky; top: 0; z-index: 20;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 18px 24px;
+    background: var(--white);
+    border-bottom: 4px solid var(--black);
+  }
+  .topbar .mark {
+    font-family: var(--font-head); font-weight: 700; font-size: 1.05rem;
+    text-transform: uppercase; letter-spacing: 0.02em;
+  }
+  .topbar nav { display: flex; gap: 4px; }
+  .topbar nav a {
+    font-family: var(--font-head); font-size: 0.72rem; text-transform: uppercase;
+    text-decoration: none; padding: 8px 12px; border: 3px solid transparent;
+    letter-spacing: 0.04em;
+  }
+  .topbar nav a:hover { border-color: var(--black); background: var(--yellow); }
+  .topbar nav a:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; }
+
+  /* ---------- hero ---------- */
+  .hero {
+    position: relative;
+    background: var(--yellow);
+    border-bottom: 4px solid var(--black);
+    padding: 88px 24px 64px;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: "";
+    position: absolute; inset: 0;
+    background-image: repeating-linear-gradient(-45deg, transparent, transparent 22px, rgba(0,0,0,.08) 22px, rgba(0,0,0,.08) 24px);
+    pointer-events: none;
+  }
+  .hero .inner { position: relative; max-width: 1180px; margin: 0 auto; }
+  .hero .eyebrow {
+    font-family: var(--font-head); font-size: 0.78rem; letter-spacing: 0.06em;
+    margin: 0 0 18px; display: inline-block; padding: 5px 10px;
+    background: var(--black); color: var(--yellow);
+  }
+  .hero h1 {
+    font-size: clamp(3rem, 9vw, 6.5rem);
+    margin: 0 0 22px;
+  }
+  .hero h1 .stroke {
+    color: transparent;
+    -webkit-text-stroke: 3px var(--black);
+  }
+  .hero p.lede {
+    font-family: var(--font-body); font-weight: 500; font-size: 1.15rem;
+    max-width: 560px; margin: 0 0 34px;
+  }
+  .hero .cta-row { display: flex; flex-wrap: wrap; gap: 16px; }
+
+  /* ---------- buttons ---------- */
+  .btn {
+    font-family: var(--font-head); text-transform: uppercase; font-size: 0.85rem;
+    letter-spacing: 0.03em;
+    padding: 15px 28px;
+    border: 4px solid var(--black);
+    background: var(--white); color: var(--black);
+    cursor: pointer;
+    box-shadow: 5px 5px 0 0 var(--black);
+    transition: transform 100ms steps(2), box-shadow 100ms steps(2), background 100ms steps(2), color 100ms steps(2);
+  }
+  .btn:hover { transform: translate(2px, 2px); box-shadow: 3px 3px 0 0 var(--black); }
+  .btn:active { transform: translate(5px, 5px); box-shadow: none; }
+  .btn:focus-visible { outline: 3px solid var(--blue); outline-offset: 3px; }
+  .btn-solid { background: var(--black); color: var(--white); box-shadow: 5px 5px 0 0 var(--yellow); }
+  .btn-solid:hover { box-shadow: 3px 3px 0 0 var(--yellow); }
+  .btn-solid:active { box-shadow: none; }
+  .btn-outline { background: transparent; box-shadow: none; }
+  .btn-outline:hover { background: var(--black); color: var(--white); transform: none; }
+
+  /* ---------- section shell ---------- */
+  section.block { padding: 72px 24px; border-bottom: 4px solid var(--black); }
+  section.block.dark { background: var(--black); color: var(--white); }
+  .head-row {
+    display: flex; align-items: baseline; justify-content: space-between; gap: 24px;
+    margin-bottom: 40px; flex-wrap: wrap;
+  }
+  .head-row h2 { font-size: clamp(2rem, 5vw, 3.2rem); }
+  .head-row .tag {
+    font-family: var(--font-head); font-size: 0.78rem; text-transform: uppercase;
+    letter-spacing: 0.04em; padding: 6px 10px; border: 3px solid currentColor;
+  }
+  .lead-text { font-size: 1.05rem; max-width: 640px; margin: 0 0 8px; }
+
+  /* ---------- principles grid ---------- */
+  .principles {
+    display: grid; grid-template-columns: repeat(3, 1fr); border: 4px solid var(--black);
+  }
+  .principles .cell {
+    padding: 28px 24px; border-right: 4px solid var(--black); border-bottom: 4px solid var(--black);
+  }
+  .principles .cell:nth-child(3n) { border-right: none; }
+  .principles .cell:nth-last-child(-n+3) { border-bottom: none; }
+  .principles .num { font-family: var(--font-head); font-size: 2rem; font-weight: 700; opacity: .35; }
+  .principles h3 { font-size: 1.05rem; margin: 10px 0 8px; }
+  .principles p { margin: 0; font-size: 0.92rem; opacity: .85; }
+
+  /* ---------- anti rules ---------- */
+  .rules-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 3px;
+    background: var(--black); border: 4px solid var(--black);
+  }
+  .rule {
+    background: var(--white); padding: 18px 18px 18px 52px; position: relative; font-size: 0.88rem;
+  }
+  section.block.dark .rule { background: var(--black); color: var(--white); }
+  .rule::before {
+    content: "✕"; position: absolute; left: 16px; top: 16px;
+    font-family: var(--font-head); font-weight: 700; color: var(--red);
+    font-size: 1.1rem;
+  }
+  .rule b { display: block; text-transform: uppercase; font-family: var(--font-head); font-size: 0.8rem; margin-bottom: 3px; }
+
+  /* ---------- palettes ---------- */
+  .palettes { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 24px; }
+  .palette-card { border: 4px solid var(--black); background: var(--white); box-shadow: 8px 8px 0 0 var(--black); }
+  section.block.dark .palette-card { box-shadow: 8px 8px 0 0 var(--yellow); }
+  .palette-card .swatches { display: flex; height: 96px; border-bottom: 4px solid var(--black); }
+  .palette-card .swatches span { flex: 1; }
+  .palette-card .info { padding: 16px 18px 20px; }
+  .palette-card .info h3 { font-size: 1rem; margin-bottom: 10px; }
+  .palette-card .hexes { display: flex; flex-direction: column; gap: 4px; font-family: var(--font-head); font-size: 0.74rem; }
+  .palette-card .hexes span { display: flex; justify-content: space-between; }
+
+  /* ---------- type scale ---------- */
+  .type-scale > div { border-bottom: 3px dashed var(--black); padding: 18px 0; display: flex; align-items: baseline; gap: 20px; flex-wrap: wrap; }
+  .type-scale > div:last-child { border-bottom: none; }
+  .type-scale .label { font-family: var(--font-head); font-size: 0.7rem; text-transform: uppercase; opacity: .5; width: 92px; flex-shrink: 0; }
+  .type-scale .sample { font-family: var(--font-head); font-weight: 700; text-transform: uppercase; }
+  .ts-1 .sample { font-size: clamp(2.4rem, 6vw, 4.5rem); }
+  .ts-2 .sample { font-size: 2.4rem; }
+  .ts-3 .sample { font-size: 1.6rem; }
+  .ts-4 .sample { font-family: var(--font-body); font-weight: 500; font-size: 1.05rem; text-transform: none; }
+  .ts-5 .sample { font-family: var(--font-body); font-size: 0.85rem; text-transform: none; opacity: .75; }
+
+  /* ---------- component gallery ---------- */
+  .gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 28px; }
+  .card {
+    border: 4px solid var(--black); background: var(--white); padding: 26px;
+    box-shadow: 8px 8px 0 0 var(--black);
+  }
+  section.block.dark .card { background: var(--black); color: var(--white); box-shadow: 8px 8px 0 0 var(--yellow); }
+  .card .kicker { font-family: var(--font-head); font-size: 0.7rem; opacity: .5; margin-bottom: 10px; }
+  .card h3 { font-size: 1.3rem; margin-bottom: 10px; }
+  .card p { margin: 0; font-size: 0.9rem; }
+  .card.lime { background: var(--lime); }
+  .card.stack { position: relative; box-shadow: none; margin: 10px 0 0 10px; }
+  .card.stack::before { content: ""; position: absolute; inset: 0; background: var(--yellow); border: 4px solid var(--black); transform: translate(10px, 10px); z-index: -1; }
+
+  .btn-demo { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start; }
+
+  .form-demo { display: flex; flex-direction: column; gap: 16px; max-width: 360px; }
+  .form-demo input[type="text"] {
+    font-family: var(--font-body); font-size: 0.95rem;
+    border: 4px solid var(--black); padding: 14px; background: var(--white); color: var(--black);
+  }
+  .form-demo input[type="text"]:focus { outline: none; box-shadow: 5px 5px 0 0 var(--black); }
+  .form-demo label { display: flex; align-items: center; gap: 10px; font-weight: 500; text-transform: uppercase; font-size: 0.85rem; font-family: var(--font-head); }
+  .form-demo input[type="checkbox"] { width: 22px; height: 22px; border: 3px solid var(--black); accent-color: var(--yellow); }
+
+  /* ---------- ticker ---------- */
+  .ticker { background: var(--black); color: var(--yellow); overflow: hidden; border-top: 4px solid var(--white); border-bottom: 4px solid var(--white); }
+  .ticker .track { display: flex; white-space: nowrap; animation: scroll 18s linear infinite; }
+  .ticker span { font-family: var(--font-head); font-weight: 700; text-transform: uppercase; font-size: 1.1rem; padding: 14px 28px; }
+  @keyframes scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+  @media (prefers-reduced-motion: reduce) { .ticker .track { animation: none; } }
+
+  footer { padding: 40px 24px; background: var(--black); color: var(--white); }
+  footer .wrap { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; font-family: var(--font-head); font-size: 0.75rem; text-transform: uppercase; opacity: .7; }
+
+  @media (max-width: 780px) {
+    .principles { grid-template-columns: 1fr; }
+    .principles .cell { border-right: none; }
+    .topbar nav { display: none; }
+  }
+</style>
+
+<div class="topbar">
+  <span class="mark">BRUTAL_REF.SKILL</span>
+  <nav>
+    <a href="#principles">Principles</a>
+    <a href="#type">Type</a>
+    <a href="#color">Color</a>
+    <a href="#components">Components</a>
+    <a href="#motion">Motion</a>
+  </nav>
+</div>
+
+<section class="hero">
+  <div class="inner">
+    <span class="eyebrow">// SKILL REFERENCE — NEO-BRUTALIST</span>
+    <h1>WHAT<br>YOU<br><span class="stroke">GET</span></h1>
+    <p class="lede">A live look at every ingredient the neo-brutalist skill applies: type pairings, color palettes, hard-shadow components, and the anti-AI rules that keep it raw.</p>
+    <div class="cta-row">
+      <button class="btn btn-solid">SEE COMPONENTS</button>
+      <button class="btn">READ THE RULES</button>
+    </div>
+  </div>
+</section>
+
+<section class="block" id="principles">
+  <div class="wrap">
+    <div class="head-row">
+      <h2>Design<br>Principles</h2>
+      <span class="tag">01 / SOURCE</span>
+    </div>
+    <div class="principles">
+      <div class="cell"><span class="num">01</span><h3>Raw Honesty</h3><p>No polish, no pretense — show the structure.</p></div>
+      <div class="cell"><span class="num">02</span><h3>Hard Edges</h3><p>No soft shadows or subtle gradients — sharp and bold.</p></div>
+      <div class="cell"><span class="num">03</span><h3>High Contrast</h3><p>Black on bright, bright on black — maximum impact.</p></div>
+      <div class="cell"><span class="num">04</span><h3>Chunky Elements</h3><p>Thick borders, heavy type, solid shapes.</p></div>
+      <div class="cell"><span class="num">05</span><h3>Intentional Ugly</h3><p>Beauty through breaking conventions.</p></div>
+      <div class="cell"><span class="num">06</span><h3>Function &gt; Form</h3><p>Elements look like what they do.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="block dark">
+  <div class="wrap">
+    <div class="head-row">
+      <h2>Anti-AI<br>Rules</h2>
+      <span class="tag">02 / GUARDRAILS</span>
+    </div>
+    <p class="lead-text">The clichés the skill deliberately avoids, so output doesn't drift toward generic polish.</p>
+    <div class="rules-grid">
+      <div class="rule"><b>No emojis</b>Never used anywhere in the design.</div>
+      <div class="rule"><b>No gradients</b>Solid colors with hard edges only.</div>
+      <div class="rule"><b>No purple/violet</b>Bold primaries or neons instead.</div>
+      <div class="rule"><b>No hero badges</b>Brutalism doesn't whisper.</div>
+      <div class="rule"><b>No glass morphism</b>Too refined, too polished.</div>
+      <div class="rule"><b>No soft shadows</b>Hard, offset shadows only.</div>
+      <div class="rule"><b>No thin borders</b>4px minimum, always.</div>
+      <div class="rule"><b>No subtle hovers</b>Bold, obvious transformations.</div>
+      <div class="rule"><b>No muted pastels</b>Saturated, loud colors.</div>
+      <div class="rule"><b>No smooth transitions</b>Instant or stepped changes.</div>
+    </div>
+  </div>
+</section>
+
+<section class="block" id="type">
+  <div class="wrap">
+    <div class="head-row">
+      <h2>Type<br>Pairing</h2>
+      <span class="tag">03 / SPACE MONO + GROTESK</span>
+    </div>
+    <p class="lead-text">This reference uses Pairing 1 — Space Mono for headlines, Space Grotesk for body. Four more pairings ship with the skill (Anton, JetBrains Mono, Bebas Neue, Archivo Black).</p>
+    <div class="type-scale">
+      <div class="ts-1"><span class="label">Display</span><span class="sample">Bold Statement</span></div>
+      <div class="ts-2"><span class="label">H1</span><span class="sample">Section Head</span></div>
+      <div class="ts-3"><span class="label">H2</span><span class="sample">Card Title</span></div>
+      <div class="ts-4"><span class="label">Body</span><span class="sample">Body copy sits in Space Grotesk at 500 weight — readable against the mono headlines without softening the page.</span></div>
+      <div class="ts-5"><span class="label">Caption</span><span class="sample">// mono captions and labels run in Space Mono at reduced size and opacity.</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="block" id="color">
+  <div class="wrap">
+    <div class="head-row">
+      <h2>Color<br>Palettes</h2>
+      <span class="tag">04 / ALL FIVE</span>
+    </div>
+    <p class="lead-text">Every palette the skill defines. Each pairs one loud color with black and white — max three colors, high contrast between them.</p>
+    <div class="palettes">
+      <div class="palette-card">
+        <div class="swatches"><span style="background:#FFFC00"></span><span style="background:#FFFFFF"></span><span style="background:#000000"></span></div>
+        <div class="info"><h3>Highlighter Yellow</h3>
+          <div class="hexes"><span>bg <b>#FFFC00</b></span><span>surface <b>#FFFFFF</b></span><span>text/border <b>#000000</b></span></div>
+        </div>
+      </div>
+      <div class="palette-card">
+        <div class="swatches"><span style="background:#FFFFFF"></span><span style="background:#00FF00"></span><span style="background:#000000"></span></div>
+        <div class="info"><h3>Neon Green</h3>
+          <div class="hexes"><span>bg <b>#FFFFFF</b></span><span>surface <b>#00FF00</b></span><span>text/border <b>#000000</b></span></div>
+        </div>
+      </div>
+      <div class="palette-card">
+        <div class="swatches"><span style="background:#FF00FF"></span><span style="background:#FFFFFF"></span><span style="background:#000000"></span></div>
+        <div class="info"><h3>Hot Pink</h3>
+          <div class="hexes"><span>bg <b>#FF00FF</b></span><span>surface <b>#FFFFFF</b></span><span>text/border <b>#000000</b></span></div>
+        </div>
+      </div>
+      <div class="palette-card">
+        <div class="swatches"><span style="background:#000000"></span><span style="background:#FFFFFF"></span><span style="background:#FF3333"></span></div>
+        <div class="info"><h3>Inverted</h3>
+          <div class="hexes"><span>bg <b>#000000</b></span><span>surface <b>#FFFFFF</b></span><span>accent <b>#FF3333</b></span></div>
+        </div>
+      </div>
+      <div class="palette-card">
+        <div class="swatches"><span style="background:#0066FF"></span><span style="background:#FFFFFF"></span><span style="background:#FFFC00"></span></div>
+        <div class="info"><h3>Electric Blue</h3>
+          <div class="hexes"><span>bg <b>#0066FF</b></span><span>surface <b>#FFFFFF</b></span><span>accent <b>#FFFC00</b></span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="block" id="components">
+  <div class="wrap">
+    <div class="head-row">
+      <h2>Component<br>Gallery</h2>
+      <span class="tag">05 / BUTTONS, CARDS, FORMS</span>
+    </div>
+
+    <p class="lead-text" style="margin-bottom:20px">Buttons — hard shadow, offset only, shadow collapses on press.</p>
+    <div class="btn-demo" style="margin-bottom:56px">
+      <button class="btn btn-solid">PRIMARY</button>
+      <button class="btn">SECONDARY</button>
+      <button class="btn btn-outline">OUTLINE</button>
+    </div>
+
+    <p class="lead-text" style="margin-bottom:20px">Cards — three treatments: hard-shadow card, flat colored card, stacked-offset card.</p>
+    <div class="gallery" style="margin-bottom:56px">
+      <div class="card">
+        <div class="kicker">01 / SHADOW CARD</div>
+        <h3>STANDARD</h3>
+        <p>Hard offset shadow, 4px border, no blur. The default container across the system.</p>
+      </div>
+      <div class="card lime">
+        <div class="kicker">02 / FLAT COLOR</div>
+        <h3>FEATURE</h3>
+        <p>Border only, no shadow — reserved for a single loud color block per section.</p>
+      </div>
+      <div class="card stack">
+        <div class="kicker">03 / STACKED</div>
+        <h3>OFFSET</h3>
+        <p>A second flat block sits behind at a fixed offset instead of a blurred shadow.</p>
+      </div>
+    </div>
+
+    <p class="lead-text" style="margin-bottom:20px">Form elements — thick borders, mono labels, shadow appears on focus.</p>
+    <div class="form-demo">
+      <input type="text" placeholder="YOUR EMAIL" />
+      <label><input type="checkbox" /> I AGREE</label>
+    </div>
+  </div>
+</section>
+
+<section class="ticker" id="motion">
+  <div class="track">
+    <span>HARD SHADOWS</span><span>★</span><span>THICK BORDERS</span><span>★</span><span>STEPPED TRANSITIONS</span><span>★</span><span>NO GRADIENTS</span><span>★</span>
+    <span>HARD SHADOWS</span><span>★</span><span>THICK BORDERS</span><span>★</span><span>STEPPED TRANSITIONS</span><span>★</span><span>NO GRADIENTS</span><span>★</span>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span>Neo-Brutalist Skill — Reference Sheet</span>
+    <span>.claude/skills/neo-brutalist</span>
+  </div>
+</footer>
