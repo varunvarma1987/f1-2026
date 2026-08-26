@@ -803,13 +803,8 @@
   const scrollThreshold = 105;
 
   function handleWheel(event) {
-    const podiumEl = event.target.closest(".podium");
-    if (podiumEl) {
-      const atTop = podiumEl.scrollTop <= 0;
-      const atBottom = podiumEl.scrollTop + podiumEl.clientHeight >= podiumEl.scrollHeight - 1;
-      if ((event.deltaY > 0 && !atBottom) || (event.deltaY < 0 && !atTop)) {
-        return; // let the podium list scroll natively
-      }
+    if (event.target.closest(".podium")) {
+      return; // let the podium list scroll natively; never advances races
     }
 
     event.preventDefault();
@@ -830,12 +825,19 @@
     if (e.key === "ArrowLeft") goTo(currentIndex - 1);
   });
 
-  /* touch swipe for mobile */
+  /* touch swipe for mobile: only a clearly horizontal swipe navigates,
+     so vertical scrolling through the driver list (even to the bottom)
+     never accidentally advances the race */
   let touchStartX = 0;
-  document.addEventListener("touchstart", (e) => { touchStartX = e.touches[0].clientX; }, { passive: true });
+  let touchStartY = 0;
+  document.addEventListener("touchstart", (e) => {
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+  }, { passive: true });
   document.addEventListener("touchend", (e) => {
     const dx = e.changedTouches[0].clientX - touchStartX;
-    if (Math.abs(dx) < 40) return;
+    const dy = e.changedTouches[0].clientY - touchStartY;
+    if (Math.abs(dx) < 40 || Math.abs(dx) <= Math.abs(dy)) return;
     if (dx < 0) goTo(currentIndex + 1);
     else goTo(currentIndex - 1);
   }, { passive: true });
