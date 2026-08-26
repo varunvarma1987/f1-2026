@@ -134,17 +134,10 @@
   .card .podium .row:nth-child(1) .pos { color: var(--red); }
   .card .podium .name {
     font-weight: 700; flex: 1; min-width: 0; text-transform: uppercase;
-    transition: font-size 0.3s ease, opacity 0.15s ease;
+    transition: opacity 0.15s ease;
     cursor: pointer;
   }
   .card .podium .name:hover { opacity: 0.55; }
-  .card .podium .row.highlight .name {
-    font-size: clamp(1.05rem, 6.5vw, 1.7rem);
-    letter-spacing: -0.02em;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
   .card .podium .points {
     font-family: var(--font-head); font-weight: 700; font-size: 1.3rem;
     flex-shrink: 0;
@@ -713,8 +706,8 @@
 
     return `
       <div class="meta-row">
-        <span class="round-tag">${r.round} / ${races.length}</span>
-        <span class="round-tag">2026 | ${r.date}</span>
+        <span class="round-tag">${r.round}/${races.length}</span>
+        <span class="round-tag">2026|${r.date.replace(/\s*-\s*/g, "-")}</span>
       </div>
       <div class="country"><span>${r.country}</span></div>
       <div class="title">${r.title}</div>
@@ -738,9 +731,7 @@
           podiumEl.classList.add("scrolling");
           clearTimeout(scrollTimer);
           scrollTimer = setTimeout(() => podiumEl.classList.remove("scrolling"), 700);
-          setHighlightRow(topRowOf(podiumEl));
         });
-        setHighlightRow(podiumEl.querySelector(".row"));
         podiumEl.addEventListener("click", (e) => {
           const nameEl = e.target.closest(".name");
           if (!nameEl || !el.classList.contains("center")) return;
@@ -751,27 +742,6 @@
       carousel.appendChild(el);
     });
     updateCards();
-  }
-
-  function topRowOf(podiumEl) {
-    const rows = podiumEl.querySelectorAll(".row");
-    if (!rows.length) return null;
-    const podiumTop = podiumEl.getBoundingClientRect().top;
-    let target = rows[0];
-    for (const row of rows) {
-      if (row.getBoundingClientRect().top - podiumTop <= 80) target = row;
-      else break;
-    }
-    return target;
-  }
-
-  function setHighlightRow(row) {
-    if (!row) return;
-    const podiumEl = row.closest(".podium");
-    const current = podiumEl.querySelector(".row.highlight");
-    if (current === row) return;
-    if (current) current.classList.remove("highlight");
-    row.classList.add("highlight");
   }
 
   /* -- carousel scroll/stack math, adapted from the source project's script.js -- */
